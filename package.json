@@ -10,16 +10,36 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:azure-devops.helloWorld"
+		"onCommand:azure-devops.helloWorld",
+		"onView:nodeDependencies"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"commands": [
 			{
 				"command": "azure-devops.helloWorld",
-				"title": "Hello World"
+				"title": "Azure-Devops"
 			}
-		]
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "azure-devops",
+					"title": "Azure Devops",
+					"icon": "resources/tux.svg"
+				}
+			]
+		},
+		"views": {
+			"azure-devops": [
+				{
+					"id": "nodeDependencies",
+					"name": "Meu bagulinho",
+					"icon": "media/dep.svg",
+					"contextualTitle": "Package Explorer"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",

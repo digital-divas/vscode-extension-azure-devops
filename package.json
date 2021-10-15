@@ -10,15 +10,20 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:azure-devops.helloWorld",
+		"onCommand:azure-devops.login",
+		"onCommand:azure-devops.createPullRequest",
 		"onView:nodeDependencies"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "azure-devops.helloWorld",
+				"command": "azure-devops.login",
 				"title": "Azure-Devops: Login"
+			},
+			{
+				"command": "azure-devops.createPullRequest",
+				"title": "Azure-Devops: Create Pull Request"
 			}
 		],
 		"viewsContainers": {
@@ -67,5 +72,9 @@
 		"ts-loader": "^9.2.2",
 		"webpack": "^5.38.1",
 		"webpack-cli": "^4.7.0"
+	},
+	"dependencies": {
+		"azure-devops-node-api": "^11.0.1",
+		"open": "^8.3.0"
 	}
 }

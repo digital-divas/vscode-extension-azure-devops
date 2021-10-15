@@ -23,5 +23,6 @@ Azure CLI (tested using 2.28.0... probably would work fine with greater versions
 
 `Azure-Devops: Login`: login to azure devops to initialize all the functions
 `Azure-Devops: Create Pull Request`: creates a pull request from the current branch to the selected target branch
+`Azure-Devops: Reload Pull Request List`: creates a pull request from the current branch to the selected target branch
 
 *Visual Studio Code Extension API Guide `https://code.visualstudio.com/api`*

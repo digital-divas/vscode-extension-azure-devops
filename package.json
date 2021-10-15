@@ -18,7 +18,7 @@
 		"commands": [
 			{
 				"command": "azure-devops.helloWorld",
-				"title": "Azure-Devops"
+				"title": "Azure-Devops: Login"
 			}
 		],
 		"viewsContainers": {

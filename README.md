@@ -13,11 +13,8 @@ The main objective of this project is to provide a good integration between Azur
 - [ ] Auto-reload the lists described before
 - [ ] Notificate when someone creates a new pull request
 
-![resources/pull_request_list.png]
+![pull_request_list](resources/pull_request_list.png)
 
-## Requirements
-
-Azure CLI (tested using 2.28.0... probably would work fine with greater versions).
 
 ## Extension Settings
 

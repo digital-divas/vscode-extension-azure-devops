@@ -6,6 +6,7 @@ The main objective of this project is to provide a good integration between Azur
 
 - [x] Login to Azure DevOps using PAT
 - [x] Create Pull Request on Azure DevOps
+- [x] Manual refresh Pull Request List from Azure DevOps
 - [ ] List pending Pull Requests created by you
 - [ ] List pending Pull Requests assigned to you (requires your approval/attention)
 - [ ] List all pending Pull Requests of your projects/repositories

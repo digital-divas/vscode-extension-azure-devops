@@ -12,6 +12,7 @@
 	"activationEvents": [
 		"onCommand:azure-devops.login",
 		"onCommand:azure-devops.createPullRequest",
+		"onCommand:azure-devops.getPullRequest",
 		"onView:nodeDependencies"
 	],
 	"main": "./dist/extension.js",
@@ -24,6 +25,10 @@
 			{
 				"command": "azure-devops.createPullRequest",
 				"title": "Azure-Devops: Create Pull Request"
+			},
+			{
+				"command": "azure-devops.getPullRequest",
+				"title": "Azure-Devops: Refresh Pull Request List"
 			}
 		],
 		"viewsContainers": {

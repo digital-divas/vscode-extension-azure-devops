@@ -4,6 +4,8 @@ import * as vscode from 'vscode';
 import * as azdev from "azure-devops-node-api";
 import * as open from 'open';
 import { DepNodeProvider } from './nodeDependencies';
+import { IGitApi } from 'azure-devops-node-api/GitApi';
+import { GitPullRequestSearchCriteria } from 'azure-devops-node-api/interfaces/GitInterfaces';
 
 
 // this method is called when your extension is activated
@@ -26,6 +28,15 @@ export async function activate(context: vscode.ExtensionContext) {
 	console.log("azurePAT", azurePAT);
 	console.log("azureOrg", azureOrg);
 	console.log("azureProject", azureProject);
+
+	const myPullRequestsProvider = new DepNodeProvider();
+	vscode.window.registerTreeDataProvider('myPullRequests', myPullRequestsProvider);
+
+	const reviewingPullRequestsProvider = new DepNodeProvider();
+	vscode.window.registerTreeDataProvider('reviewingPullRequests', reviewingPullRequestsProvider);
+
+	const allPullRequestsProvider = new DepNodeProvider();
+	vscode.window.registerTreeDataProvider('allPullRequests', allPullRequestsProvider);
 
 	const login = vscode.commands.registerCommand('azure-devops.login', async () => {
 
@@ -132,7 +143,25 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	});
 
-	const getPullRequest = vscode.commands.registerCommand('azure-devops.getPullRequest', async () => {
+	async function loadPRs(git: IGitApi, gitPullRequestSearchCriteria: GitPullRequestSearchCriteria, provider: DepNodeProvider) {
+		let myPullRequests = await git.getPullRequestsByProject((azureProject as string), gitPullRequestSearchCriteria);
+
+		provider.elements = myPullRequests.map((each) => {
+			return {
+				"id": each.pullRequestId,
+				"repository": each.repository?.name,
+				"creator": each.createdBy?.displayName,
+				"link": azureOrg + "/" + encodeURIComponent(azureProject as string) + "/_git/" + each.repository?.name + "/pullrequest/" + each.pullRequestId,
+				"targetBranch": each.targetRefName?.replace("refs/heads/", ""),
+				"sourceBranch": each.sourceRefName?.replace("refs/heads/", ""),
+				"title": each.title
+			};
+		});
+
+		provider.refresh();
+	}
+
+	async function reloadPRs() {
 		if (!azureOrg || !azureProject || !azurePAT) {
 			vscode.window.showWarningMessage('You need to login to Azure DevOps first.');
 			return;
@@ -149,51 +178,34 @@ export async function activate(context: vscode.ExtensionContext) {
 			}
 
 			let git = await connection.getGitApi();
-			let myPullRequests = await git.getPullRequestsByProject(azureProject, { creatorId: connectionData.authenticatedUser.id });
 
-			console.log(myPullRequests.map((each) => {
-				return {
-					"id": each.pullRequestId,
-					"repository": each.repository?.name,
-					"creator": each.createdBy?.displayName,
-					"link": azureOrg + "/" + encodeURIComponent(azureProject as string) + "/_git/" + each.repository?.name + "/pullrequest/" + each.pullRequestId,
-					"targetBranch": each.targetRefName?.replace("refs/heads/", ""),
-				};
-			}));
-			let reviewingPullRequests = await git.getPullRequestsByProject(azureProject, { reviewerId: connectionData.authenticatedUser.id });
-			console.log(reviewingPullRequests.map((each) => {
-				return {
-					"id": each.pullRequestId,
-					"repository": each.repository?.name,
-					"creator": each.createdBy?.displayName,
-					"link": azureOrg + "/" + encodeURIComponent(azureProject as string) + "/_git/" + each.repository?.name + "/pullrequest/" + each.pullRequestId,
-					"targetBranch": each.targetRefName?.replace("refs/heads/", ""),
-				};
-			}));
-			let allPullRequests = await git.getPullRequestsByProject(azureProject, {});
-			console.log(allPullRequests.map((each) => {
-				return {
-					"id": each.pullRequestId,
-					"repository": each.repository?.name,
-					"creator": each.createdBy?.displayName,
-					"link": azureOrg + "/" + encodeURIComponent(azureProject as string) + "/_git/" + each.repository?.name + "/pullrequest/" + each.pullRequestId,
-					"targetBranch": each.targetRefName?.replace("refs/heads/", ""),
-				};
-			}));
+
+			await Promise.all([
+				loadPRs(git, { creatorId: connectionData.authenticatedUser.id }, myPullRequestsProvider),
+				loadPRs(git, { reviewerId: connectionData.authenticatedUser.id }, reviewingPullRequestsProvider),
+				loadPRs(git, {}, allPullRequestsProvider),
+			]);
 
 		} catch (err) {
 			console.error(err);
 			vscode.window.showErrorMessage((err as Error).message);
 		}
 
+	}
+
+	const getPullRequest = vscode.commands.registerCommand('azure-devops.getPullRequest', reloadPRs);
+
+	const openPullRequestOnBrowser = vscode.commands.registerCommand('azure-devops.openPullRequestOnBrowser', async (link) => {
+		open(link);
 	});
+
 
 	context.subscriptions.push(login);
 	context.subscriptions.push(createPullRequest);
 	context.subscriptions.push(getPullRequest);
+	context.subscriptions.push(openPullRequestOnBrowser);
 
-	const nodeDependenciesProvider = new DepNodeProvider("/mnt/5cb80605-c86e-4351-b941-96d1cb6eadab/Documents/Projects/vscode-extension-azure-devops");
-	vscode.window.registerTreeDataProvider('nodeDependencies', nodeDependenciesProvider);
+	await reloadPRs();
 
 }
 

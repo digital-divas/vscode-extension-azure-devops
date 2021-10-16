@@ -13,7 +13,10 @@
 		"onCommand:azure-devops.login",
 		"onCommand:azure-devops.createPullRequest",
 		"onCommand:azure-devops.getPullRequest",
-		"onView:nodeDependencies"
+		"onCommand:azure-devops.openPullRequestOnBrowser",
+		"onView:myPullRequests",
+		"onView:reviewingPullRequests",
+		"onView:allPullRequests"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
@@ -43,8 +46,20 @@
 		"views": {
 			"azure-devops": [
 				{
-					"id": "nodeDependencies",
-					"name": "Meu bagulinho",
+					"id": "myPullRequests",
+					"name": "Pull Requests Created by Me",
+					"icon": "media/dep.svg",
+					"contextualTitle": "Package Explorer"
+				},
+				{
+					"id": "reviewingPullRequests",
+					"name": "Pull Requests Assigned to Me",
+					"icon": "media/dep.svg",
+					"contextualTitle": "Package Explorer"
+				},
+				{
+					"id": "allPullRequests",
+					"name": "All Pull Requests",
 					"icon": "media/dep.svg",
 					"contextualTitle": "Package Explorer"
 				}

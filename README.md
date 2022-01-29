@@ -13,9 +13,6 @@ The main objective of this project is to provide a good integration between Azur
 - [ ] Auto-reload the lists described before
 - [ ] Notificate when someone creates a new pull request
 
-![pull_request_list](resources/pull_request_list.png)
-
-
 ## Extension Settings
 
 - `azure-devops.enable`: enable/disable this extension
@@ -27,3 +24,11 @@ The main objective of this project is to provide a good integration between Azur
 - `Azure-Devops: Reload Pull Request List`: creates a pull request from the current branch to the selected target branch
 
 *Visual Studio Code Extension API Guide `https://code.visualstudio.com/api`*
+
+### How to build?
+
+`https://code.visualstudio.com/api/working-with-extensions/publishing-extension`
+
+```bash
+vsce package
+```

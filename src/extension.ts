@@ -3,10 +3,21 @@
 import * as vscode from 'vscode';
 import * as azdev from "azure-devops-node-api";
 import * as open from 'open';
+import * as fs from 'fs';
 import { DepNodeProvider } from './nodeDependencies';
 import { IGitApi } from 'azure-devops-node-api/GitApi';
 import { GitPullRequestSearchCriteria } from 'azure-devops-node-api/interfaces/GitInterfaces';
 
+async function readFileAsync(filename: fs.PathLike): Promise<Buffer> {
+	return new Promise((resolve, reject) => {
+		fs.readFile(filename, (err, buffer) => {
+			if (err) {
+				return reject(err);
+			}
+			return resolve(buffer);
+		});
+	});
+};
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -24,10 +35,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	azurePAT = context.globalState.get(azurePATKey);
 	azureOrg = context.globalState.get(azureOrgKey);
 	azureProject = context.globalState.get(azureProjectKey);
-
-	console.log("azurePAT", azurePAT);
-	console.log("azureOrg", azureOrg);
-	console.log("azureProject", azureProject);
 
 	const myPullRequestsProvider = new DepNodeProvider();
 	vscode.window.registerTreeDataProvider('myPullRequests', myPullRequestsProvider);
@@ -82,10 +89,28 @@ export async function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
+		let repoName, branch;
+
+		if (vscode.workspace.workspaceFolders) {
+			try {
+				// repository name
+				const splitedPath = vscode.workspace.workspaceFolders[0].uri.path.split("/");
+				repoName = splitedPath[splitedPath.length - 1];
+
+				// branch
+				const gitHeadFilePath = vscode.workspace.workspaceFolders[0].uri.path + "/.git/HEAD";
+				const content = await readFileAsync(gitHeadFilePath);
+				const splitedContent = content.toString().split("refs/heads/");
+				branch = splitedContent[splitedContent.length - 1].split("\n")[0];
+			} catch (err) {
+				// no problem
+			}
+		}
+
 		const repositoryName = await vscode.window.showInputBox({
 			title: "Repository Name",
 			placeHolder: "Repository Name",
-			value: "zowee-firmware"
+			value: repoName
 		});
 
 		if (!repositoryName) {
@@ -95,7 +120,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		const sourceBranch = await vscode.window.showInputBox({
 			title: "Source Branch",
 			placeHolder: "Source Branch",
-			value: "stage"
+			value: branch
 		});
 
 		if (!sourceBranch) {

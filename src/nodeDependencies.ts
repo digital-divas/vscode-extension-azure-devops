@@ -21,7 +21,6 @@ export class DepNodeProvider implements vscode.TreeDataProvider<Dependency> {
 
     getChildren(element?: Dependency): Thenable<Dependency[]> {
         if (element) {
-            console.log(element.props);
             return Promise.resolve([
                 new Dependency("Title", element.props.title, {}, vscode.TreeItemCollapsibleState.None),
                 new Dependency("Author", element.props.creator, {}, vscode.TreeItemCollapsibleState.None),
@@ -31,70 +30,13 @@ export class DepNodeProvider implements vscode.TreeDataProvider<Dependency> {
                     arguments: [element.props.link]
                 })
             ]);
-            // const elements = this.elements.map((each) => new Dependency(each.repository, each.targetBranch, each, vscode.TreeItemCollapsibleState.None));
-            // return Promise.resolve([]);
         }
         const elements = this.elements.map((each) => new Dependency(each.repository, each.targetBranch, each, vscode.TreeItemCollapsibleState.Expanded));
         return Promise.resolve(elements);
 
 
-        // if (element) {
-        //     return Promise.resolve(this.getDepsInPackageJson(path.join(this.workspaceRoot, 'node_modules', element.label, 'package.json')));
-        // } else {
-        //     const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
-        //     if (this.pathExists(packageJsonPath)) {
-        //         return Promise.resolve(this.getDepsInPackageJson(packageJsonPath));
-        //     } else {
-        //         vscode.window.showInformationMessage('Workspace has no package.json');
-        //         return Promise.resolve([]);
-        //     }
-        // }
-
     }
 
-    /**
-     * Given the path to package.json, read all its dependencies and devDependencies.
-     */
-    private getDepsInPackageJson(packageJsonPath: string): Dependency[] {
-
-        return [];
-
-        // if (this.pathExists(packageJsonPath)) {
-        //     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-
-        //     const toDep = (moduleName: string, version: string): Dependency => {
-        //         if (this.pathExists(path.join(this.workspaceRoot, 'node_modules', moduleName))) {
-        //             return new Dependency(moduleName, version, vscode.TreeItemCollapsibleState.Collapsed);
-        //         } else {
-        //             return new Dependency(moduleName, version, vscode.TreeItemCollapsibleState.None, {
-        //                 command: 'extension.openPackageOnNpm',
-        //                 title: '',
-        //                 arguments: [moduleName]
-        //             });
-        //         }
-        //     };
-
-        //     const deps = packageJson.dependencies
-        //         ? Object.keys(packageJson.dependencies).map(dep => toDep(dep, packageJson.dependencies[dep]))
-        //         : [];
-        //     const devDeps = packageJson.devDependencies
-        //         ? Object.keys(packageJson.devDependencies).map(dep => toDep(dep, packageJson.devDependencies[dep]))
-        //         : [];
-        //     return deps.concat(devDeps);
-        // } else {
-        //     return [];
-        // }
-    }
-
-    private pathExists(p: string): boolean {
-        try {
-            fs.accessSync(p);
-        } catch (err) {
-            return false;
-        }
-
-        return true;
-    }
 }
 
 export class Dependency extends vscode.TreeItem {
